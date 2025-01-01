@@ -1,11 +1,12 @@
 import { io, Socket } from 'socket.io-client';
 import { Room, VideoState, Message } from '../types/types';
 
+const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
 // Singleton class for managing socket connections
 class SocketService {
     private static instance: SocketService;
     private socket: Socket | null = null;
-    private readonly SERVER_URL = 'http://localhost:3001';
 
     private constructor() {}
 
@@ -16,28 +17,9 @@ class SocketService {
         return SocketService.instance;
     }
 
-    connect() {
-        if (!this.socket || !this.socket.connected) {
-            console.log('Creating new socket connection');
-            this.socket = io(this.SERVER_URL, {
-                transports: ['websocket'],
-                autoConnect: true,
-                reconnection: true,
-                reconnectionAttempts: 5,
-                reconnectionDelay: 1000
-            });
-            
-            this.socket.on('connect', () => {
-                console.log('Connected to server with ID:', this.socket?.id);
-            });
-
-            this.socket.on('disconnect', () => {
-                console.log('Disconnected from server');
-            });
-
-            this.socket.on('connect_error', (error) => {
-                console.error('Connection error:', error);
-            });
+    connect(): Socket {
+        if (!this.socket) {
+            this.socket = io(SOCKET_URL);
         }
         return this.socket;
     }

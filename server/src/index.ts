@@ -9,12 +9,18 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: process.env.NODE_ENV === 'production' 
+            ? ['https://your-frontend-url.vercel.app', 'http://localhost:3000']
+            : "http://localhost:3000",
         methods: ["GET", "POST"]
     }
 });
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production'
+        ? ['https://your-frontend-url.vercel.app', 'http://localhost:3000']
+        : "http://localhost:3000"
+}));
 app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
