@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "Watch Party uygulaması backend sunucusu",
+  "description": "Watch Party application backend server",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",

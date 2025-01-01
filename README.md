@@ -1,18 +1,18 @@
 # Watch Party App 🎥
 
-Watch Party, arkadaşlarınızla birlikte eş zamanlı olarak video izlemenizi sağlayan bir web uygulamasıdır. Uygulama, video oynatma kontrollerini senkronize ederek uzaktaki arkadaşlarınızla birlikte film/video izleme deneyimi sunar.
+Watch Party is a web application that allows you to watch videos simultaneously with your friends. The application provides a shared movie/video watching experience with your remote friends by synchronizing video playback controls.
 
-## 🚀 Özellikler
+## 🚀 Features
 
-- ✨ Gerçek zamanlı video senkronizasyonu
-- 🎮 Oynatma, duraklatma ve ileri/geri sarma kontrollerinin senkronizasyonu
-- 💬 Gerçek zamanlı sohbet
-- 🎥 YouTube video desteği
-- 📁 Yerel video dosyası desteği
-- 🔗 Video URL desteği
-- 👥 Oda yönetimi ve davet sistemi
+- ✨ Real-time video synchronization
+- 🎮 Synchronization of play, pause, and seek controls
+- 💬 Real-time chat
+- 🎥 YouTube video support
+- 📁 Local video file support
+- 🔗 Video URL support
+- 👥 Room management and invitation system
 
-## 🛠️ Teknolojiler
+## 🛠️ Technologies
 
 - **Frontend:**
   - React.js
@@ -26,66 +26,66 @@ Watch Party, arkadaşlarınızla birlikte eş zamanlı olarak video izlemenizi s
   - Socket.io
   - MongoDB/PostgreSQL
 
-## 🚦 Başlangıç
+## 🚦 Getting Started
 
-### Gereksinimler
+### Requirements
 
-- Node.js (v14 veya üzeri)
-- npm veya yarn
-- MongoDB veya PostgreSQL
+- Node.js (v14 or higher)
+- npm or yarn
+- MongoDB or PostgreSQL
 
-### Kurulum
+### Installation
 
-1. Projeyi klonlayın
+1. Clone the project
 ```bash
-git clone https://github.com/kullaniciadi/watch-party-app.git
+git clone https://github.com/username/watch-party-app.git
 cd watch-party-app
 ```
 
-2. Bağımlılıkları yükleyin
+2. Install dependencies
 ```bash
 npm install
-# veya
+# or
 yarn install
 ```
 
-3. Geliştirme sunucusunu başlatın
+3. Start the development server
 ```bash
 npm run dev
-# veya
+# or
 yarn dev
 ```
 
-4. Tarayıcınızda `http://localhost:3000` adresini açın
+4. Open `http://localhost:3000` in your browser
 
-## 📝 Kullanım
+## 📝 Usage
 
-1. Ana sayfadan "Oda Oluştur" butonuna tıklayın
-2. Oluşturulan oda kodunu arkadaşlarınızla paylaşın
-3. Video URL'sini girin veya yerel video dosyası yükleyin
-4. Birlikte izlemeye başlayın!
+1. Click "Create Room" button on the home page
+2. Share the generated room code with your friends
+3. Enter a video URL or upload a local video file
+4. Start watching together!
 
-## 🔒 Güvenlik
+## 🔒 Security
 
-- JWT tabanlı kimlik doğrulama
-- Güvenli WebSocket bağlantıları
-- XSS ve CSRF koruması
+- JWT-based authentication
+- Secure WebSocket connections
+- XSS and CSRF protection
 - Rate limiting
 
-## 🤝 Katkıda Bulunma
+## 🤝 Contributing
 
-1. Bu projeyi fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'feat: Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
+1. Fork this project
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: Add amazing feature'`)
+4. Push your branch (`git push origin feature/amazing-feature`)
+5. Create a Pull Request
 
-## 📜 Lisans
+## 📜 License
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 📞 İletişim
+## 📞 Contact
 
-Proje Sahibi - [@github_kullaniciadi](https://github.com/kullaniciadi)
+Project Owner - [@github_username](https://github.com/mucahit-sahin)
 
-Proje Linki: [https://github.com/kullaniciadi/watch-party-app](https://github.com/kullaniciadi/watch-party-app) 
+Project Link: [https://github.com/username/watch-party-app](https://github.com/mucahit-sahin/watch-party-app) 

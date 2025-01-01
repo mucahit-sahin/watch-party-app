@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
                 id: Date.now().toString(),
                 userId: '',
                 username: 'System',
-                content: `${username} odaya katıldı`,
+                content: `${username} joined the room`,
                 messageType: 'system',
                 timestamp: Date.now()
             });
@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
                 id: Date.now().toString(),
                 userId: '',
                 username: 'System',
-                content: `${user?.username} yeni bir video ekledi`,
+                content: `${user?.username} added a new video`,
                 messageType: 'system',
                 timestamp: Date.now()
             });
@@ -149,7 +149,7 @@ function handleUserLeave(socketId: string, roomId: string, userId: string) {
                 id: Date.now().toString(),
                 userId: '',
                 username: 'System',
-                content: `${leavingUser?.username} odadan ayrıldı`,
+                content: `${leavingUser?.username} left the room`,
                 messageType: 'system',
                 timestamp: Date.now()
             });

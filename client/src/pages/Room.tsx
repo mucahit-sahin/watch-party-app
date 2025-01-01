@@ -49,7 +49,7 @@ export const Room: React.FC = () => {
             return;
         }
 
-        // Eğer location state'den room bilgisi gelmemişse, kullanıcı adı modalını göster
+        // If room information doesn't come from location state, show username modal
         if (!location.state?.room) {
             setShowUsernameDialog(true);
         } else {
@@ -160,7 +160,7 @@ export const Room: React.FC = () => {
 
     const handleJoinRoom = () => {
         if (!username.trim()) {
-            setUsernameError('Lütfen bir kullanıcı adı girin');
+            setUsernameError('Please enter a username');
             return;
         }
 
@@ -173,7 +173,7 @@ export const Room: React.FC = () => {
                 }
                 setShowUsernameDialog(false);
             } else {
-                setUsernameError('Odaya katılırken bir hata oluştu');
+                setUsernameError('An error occurred while joining the room');
             }
         });
     };
@@ -185,15 +185,15 @@ export const Room: React.FC = () => {
     return (
         <>
             <Dialog open={showUsernameDialog} onClose={() => navigate('/')} maxWidth="xs" fullWidth>
-                <DialogTitle>Odaya Katıl</DialogTitle>
+                <DialogTitle>Join Room</DialogTitle>
                 <DialogContent>
                     <Typography variant="body1" sx={{ mb: 2 }}>
-                        Odaya katılmak için lütfen bir kullanıcı adı girin
+                        Please enter a username to join the room
                     </Typography>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Kullanıcı Adı"
+                        label="Username"
                         fullWidth
                         value={username}
                         onChange={(e) => {
@@ -205,9 +205,9 @@ export const Room: React.FC = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => navigate('/')}>İptal</Button>
+                    <Button onClick={() => navigate('/')}>Cancel</Button>
                     <Button onClick={handleJoinRoom} variant="contained">
-                        Katıl
+                        Join
                     </Button>
                 </DialogActions>
             </Dialog>
