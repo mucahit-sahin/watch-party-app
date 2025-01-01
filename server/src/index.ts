@@ -46,6 +46,10 @@ io.on('connection', (socket) => {
             userRoomMap.set(socket.id, { roomId, userId: joinedUser.id });
             callback(room);
             io.to(roomId).emit('user_joined', room);
+            // Send current video URL to the new user
+            if (room.videoUrl) {
+                socket.emit('video_url_updated', room.videoUrl);
+            }
             console.log('User joined room:', { roomId, username, room });
         } else {
             callback(null);
