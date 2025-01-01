@@ -46,6 +46,17 @@ io.on('connection', (socket) => {
             userRoomMap.set(socket.id, { roomId, userId: joinedUser.id });
             callback(room);
             io.to(roomId).emit('user_joined', room);
+
+            // Send system message about user joining
+            io.to(roomId).emit('message_received', {
+                id: Date.now().toString(),
+                userId: '',
+                username: 'System',
+                content: `${username} odaya katıldı`,
+                messageType: 'system',
+                timestamp: Date.now()
+            });
+
             // Send current video URL and state to the new user
             if (room.videoUrl) {
                 socket.emit('video_url_updated', room.videoUrl);
@@ -109,12 +120,26 @@ io.on('connection', (socket) => {
 
 // Function to handle user leaving
 function handleUserLeave(socketId: string, roomId: string, userId: string) {
-    const room = roomManager.leaveRoom(roomId, userId);
+    const room = roomManager.getRoom(roomId);
     if (room) {
-        io.to(roomId).emit('user_left', room);
-        console.log('User left room:', { roomId, userId, room });
+        const leavingUser = room.users.find(u => u.id === userId);
+        const updatedRoom = roomManager.leaveRoom(roomId, userId);
+        userRoomMap.delete(socketId);
+
+        if (updatedRoom) {
+            io.to(roomId).emit('user_left', updatedRoom);
+            
+            // Send system message about user leaving
+            io.to(roomId).emit('message_received', {
+                id: Date.now().toString(),
+                userId: '',
+                username: 'System',
+                content: `${leavingUser?.username} odadan ayrıldı`,
+                messageType: 'system',
+                timestamp: Date.now()
+            });
+        }
     }
-    userRoomMap.delete(socketId);
 }
 
 // Start server

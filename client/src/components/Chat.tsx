@@ -67,14 +67,17 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                                         variant="body2"
                                         color="text.secondary"
                                     >
-                                        {message.username}
+                                        {message.messageType === 'system' ? '' : message.username}
                                     </Typography>
                                 }
                                 secondary={
                                     <Typography
                                         component="span"
                                         variant="body1"
-                                        color="text.primary"
+                                        color={message.messageType === 'system' ? 'text.secondary' : 'text.primary'}
+                                        sx={{
+                                            fontStyle: message.messageType === 'system' ? 'italic' : 'normal'
+                                        }}
                                     >
                                         {message.content}
                                     </Typography>

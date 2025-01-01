@@ -143,7 +143,8 @@ export const Room: React.FC = () => {
             socketService.sendMessage(roomId, {
                 userId: currentUser.id,
                 username: currentUser.username,
-                content
+                content,
+                messageType: 'user'
             });
         }
     };
