@@ -10,7 +10,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
         origin: process.env.NODE_ENV === 'production' 
-            ? ['https://your-frontend-url.vercel.app', 'http://localhost:3000']
+            ? ['https://watch-party-app.vercel.app', 'http://localhost:3000']
             : "http://localhost:3000",
         methods: ["GET", "POST"]
     }
@@ -18,7 +18,7 @@ const io = new Server(httpServer, {
 
 app.use(cors({
     origin: process.env.NODE_ENV === 'production'
-        ? ['https://your-frontend-url.vercel.app', 'http://localhost:3000']
+        ? ['https://watch-party-app.vercel.app', 'http://localhost:3000']
         : "http://localhost:3000"
 }));
 app.use(express.json());
