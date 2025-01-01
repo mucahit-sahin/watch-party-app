@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { Room, VideoState, Message } from '../types/types';
 
+// Singleton class for managing socket connections
 class SocketService {
     private static instance: SocketService;
     private socket: Socket | null = null;
@@ -49,7 +50,7 @@ class SocketService {
         }
     }
 
-    // Oda işlemleri
+    // Room operations
     createRoom(username: string, callback: (room: Room) => void) {
         const socket = this.connect();
         console.log('Creating room for user:', username);
@@ -73,7 +74,7 @@ class SocketService {
         this.socket?.emit('leave_room', { roomId, userId });
     }
 
-    // Video kontrolleri
+    // Video controls
     updateVideoState(roomId: string, videoState: VideoState) {
         console.log('Updating video state:', videoState);
         this.socket?.emit('video_state_change', { roomId, videoState });
@@ -83,7 +84,7 @@ class SocketService {
         this.socket?.on('video_state_updated', callback);
     }
 
-    // Video URL
+    // Video URL management
     updateVideoUrl(roomId: string, url: string) {
         console.log('Updating video URL:', url);
         this.socket?.emit('video_url_change', { roomId, url });
@@ -93,7 +94,7 @@ class SocketService {
         this.socket?.on('video_url_updated', callback);
     }
 
-    // Sohbet mesajları
+    // Chat messages
     sendMessage(roomId: string, message: Omit<Message, 'id' | 'timestamp'>) {
         console.log('Sending message:', message);
         this.socket?.emit('send_message', { roomId, message });
@@ -103,7 +104,7 @@ class SocketService {
         this.socket?.on('message_received', callback);
     }
 
-    // Kullanıcı güncellemeleri
+    // User updates
     onUserJoined(callback: (room: Room) => void) {
         this.socket?.on('user_joined', (updatedRoom: Room) => {
             console.log('User joined:', updatedRoom);

@@ -19,7 +19,7 @@ export const Home: React.FC = () => {
 
     const handleCreateRoom = () => {
         if (!username) {
-            setError('Lütfen bir kullanıcı adı girin');
+            setError('Please enter a username');
             return;
         }
 
@@ -31,18 +31,18 @@ export const Home: React.FC = () => {
                     navigate(`/room/${room.id}`, { state: { room } });
                 } else {
                     console.error('Room creation failed');
-                    setError('Oda oluşturulurken bir hata oluştu');
+                    setError('An error occurred while creating the room');
                 }
             });
         } catch (err) {
             console.error('Error creating room:', err);
-            setError('Oda oluşturulurken bir hata oluştu');
+            setError('An error occurred while creating the room');
         }
     };
 
     const handleJoinRoom = () => {
         if (!username || !roomId) {
-            setError('Lütfen kullanıcı adı ve oda kodunu girin');
+            setError('Please enter username and room code');
             return;
         }
 
@@ -54,12 +54,12 @@ export const Home: React.FC = () => {
                     navigate(`/room/${room.id}`, { state: { room } });
                 } else {
                     console.error('Room join failed');
-                    setError('Odaya katılırken bir hata oluştu');
+                    setError('An error occurred while joining the room');
                 }
             });
         } catch (err) {
             console.error('Error joining room:', err);
-            setError('Odaya katılırken bir hata oluştu');
+            setError('An error occurred while joining the room');
         }
     };
 
@@ -72,13 +72,13 @@ export const Home: React.FC = () => {
                     </Typography>
                     
                     <Typography variant="body1" align="center" color="text.secondary" paragraph>
-                        Arkadaşlarınızla birlikte video izleyin
+                        Watch videos together with your friends
                     </Typography>
 
                     <Box component="form" sx={{ mt: 2 }}>
                         <TextField
                             fullWidth
-                            label="Kullanıcı Adı"
+                            label="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             margin="normal"
@@ -92,15 +92,15 @@ export const Home: React.FC = () => {
                                 onClick={handleCreateRoom}
                                 size="large"
                             >
-                                Yeni Oda Oluştur
+                                Create New Room
                             </Button>
                         </Box>
 
-                        <Divider sx={{ my: 3 }}>veya</Divider>
+                        <Divider sx={{ my: 3 }}>or</Divider>
 
                         <TextField
                             fullWidth
-                            label="Oda Kodu"
+                            label="Room Code"
                             value={roomId}
                             onChange={(e) => setRoomId(e.target.value)}
                             margin="normal"
@@ -114,7 +114,7 @@ export const Home: React.FC = () => {
                                 onClick={handleJoinRoom}
                                 size="large"
                             >
-                                Odaya Katıl
+                                Join Room
                             </Button>
                         </Box>
 

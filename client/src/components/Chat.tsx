@@ -47,7 +47,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
     return (
         <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h6">Sohbet</Typography>
+                <Typography variant="h6">Chat</Typography>
             </Box>
 
             <List sx={{ 
@@ -94,7 +94,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                     <TextField
                         fullWidth
                         size="small"
-                        placeholder="Mesajınızı yazın..."
+                        placeholder="Type your message..."
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyPress={handleKeyPress}

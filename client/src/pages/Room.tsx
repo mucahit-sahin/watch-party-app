@@ -136,11 +136,11 @@ export const Room: React.FC = () => {
     return (
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-                {/* Sol Panel - Kullanıcı Listesi */}
+                {/* Left Panel - User List */}
                 <Grid item xs={12} md={3}>
                     <Paper sx={{ p: 2, height: '100%' }}>
                         <Typography variant="h6" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span>Katılımcılar</span>
+                            <span>Participants</span>
                             <Box
                                 component="span"
                                 sx={{
@@ -176,7 +176,7 @@ export const Room: React.FC = () => {
                     </Paper>
                 </Grid>
 
-                {/* Orta Panel - Video Oynatıcı */}
+                {/* Center Panel - Video Player */}
                 <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 2 }}>
                         {isHost && (
@@ -195,7 +195,7 @@ export const Room: React.FC = () => {
                                     disabled={!newVideoUrl}
                                     sx={{ mt: 1 }}
                                 >
-                                    Video Değiştir
+                                    Change Video
                                 </Button>
                             </Box>
                         )}
@@ -218,14 +218,14 @@ export const Room: React.FC = () => {
                                 bgcolor: 'grey.100'
                             }}>
                                 <Typography variant="h6" color="text.secondary">
-                                    Video URL'si bekleniyor...
+                                    Waiting for video URL...
                                 </Typography>
                             </Box>
                         )}
                     </Paper>
                 </Grid>
 
-                {/* Sağ Panel - Sohbet */}
+                {/* Right Panel - Chat */}
                 <Grid item xs={12} md={3}>
                     <Box sx={{ height: '70vh' }}>
                         <Chat

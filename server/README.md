@@ -1,89 +1,59 @@
-# Watch Party - Backend Server 🎥
+# Watch Party Backend Server
 
-Bu proje, Watch Party uygulamasının backend sunucu kısmıdır. Socket.IO kullanarak gerçek zamanlı video senkronizasyonu ve sohbet özelliklerini sağlar.
+A real-time backend server for the Watch Party application that enables synchronized video watching and chat functionality.
 
-## 🚀 Özellikler
+## Features
 
-- ✨ Gerçek zamanlı oda yönetimi
-- 🎮 Video senkronizasyonu
-- 💬 Anlık mesajlaşma
-- 👥 Kullanıcı yönetimi
-- 🔒 Host sistemi
+- Real-time room management
+- Video synchronization between users
+- Live chat functionality
+- User presence tracking
+- Host controls for video playback
 
-## 🛠️ Teknolojiler
+## Technologies Used
 
 - Node.js
 - Express.js
 - Socket.IO
 - TypeScript
-- UUID
 
-## 📦 Gereksinimler
+## Installation
 
-- Node.js (v14 veya üzeri)
-- npm veya yarn
-
-## 🚦 Kurulum
-
-1. Bağımlılıkları yükleyin:
+1. Clone the repository
+2. Navigate to the server directory:
+```bash
+cd server
+```
+3. Install dependencies:
 ```bash
 npm install
 ```
-
-2. Geliştirme modunda çalıştırın:
+4. Start the development server:
 ```bash
 npm run dev
 ```
 
-3. Prodüksiyon için derleyin:
-```bash
-npm run build
-```
+The server will start on port 3001 by default.
 
-4. Prodüksiyon modunda çalıştırın:
-```bash
-npm start
-```
+## Socket.IO Events
 
-## 🔌 Socket.IO Olayları
+### Room Events
+- `createRoom`: Create a new watch party room
+- `joinRoom`: Join an existing room
+- `leaveRoom`: Leave the current room
+- `updateVideoUrl`: Update the video URL (host only)
+- `updateVideoState`: Sync video playback state
+- `disconnect`: Handle user disconnection
 
-### Oda İşlemleri
+### Chat Events
+- `sendMessage`: Send a chat message
+- `receiveMessage`: Receive chat messages
 
-#### `create_room`
-- **Gönderilen:** `{ username: string }`
-- **Yanıt:** `Room` objesi
-- **Açıklama:** Yeni bir izleme odası oluşturur
-
-#### `join_room`
-- **Gönderilen:** `{ roomId: string, username: string }`
-- **Yanıt:** `Room` objesi veya `null`
-- **Açıklama:** Mevcut bir odaya katılım sağlar
-
-#### `leave_room`
-- **Gönderilen:** `{ roomId: string, userId: string }`
-- **Açıklama:** Odadan ayrılma işlemi gerçekleştirir
-
-### Video İşlemleri
-
-#### `video_state_change`
-- **Gönderilen:** `{ roomId: string, videoState: VideoState }`
-- **Açıklama:** Video durumunu günceller (oynatma, duraklatma, ilerleme)
-
-#### `video_url_change`
-- **Gönderilen:** `{ roomId: string, url: string }`
-- **Açıklama:** Odadaki video URL'sini günceller
-
-### Mesajlaşma
-
-#### `send_message`
-- **Gönderilen:** `{ roomId: string, message: Message }`
-- **Açıklama:** Odaya mesaj gönderir
-
-## 📝 Tip Tanımlamaları
+## Type Definitions
 
 ### User
 ```typescript
-{
+interface User {
     id: string;
     username: string;
     isHost: boolean;
@@ -92,29 +62,26 @@ npm start
 
 ### Room
 ```typescript
-{
+interface Room {
     id: string;
-    hostId: string;
     users: User[];
-    videoUrl: string;
-    isPlaying: boolean;
-    currentTime: number;
+    videoUrl: string | null;
+    videoState: VideoState;
 }
 ```
 
 ### VideoState
 ```typescript
-{
+interface VideoState {
     isPlaying: boolean;
     currentTime: number;
-    duration: number;
-    buffered: number;
+    timestamp: number;
 }
 ```
 
 ### Message
 ```typescript
-{
+interface Message {
     id: string;
     userId: string;
     username: string;
@@ -123,10 +90,11 @@ npm start
 }
 ```
 
-## 🔧 Ortam Değişkenleri
+## Environment Variables
 
-- `PORT`: Sunucu portu (varsayılan: 3001)
+- `PORT`: Server port (default: 3001)
+- `CLIENT_URL`: Frontend application URL for CORS
 
-## 📜 Lisans
+## License
 
-Bu proje MIT lisansı altında lisanslanmıştır. 
+This project is licensed under the MIT License. 

@@ -1,6 +1,7 @@
 import { Room, User, VideoState, RoomManager } from '../types/types';
 import { v4 as uuidv4 } from 'uuid';
 
+// Implementation of the RoomManager interface
 class RoomManagerImpl implements RoomManager {
     rooms: Map<string, Room>;
 
@@ -12,12 +13,14 @@ class RoomManagerImpl implements RoomManager {
         const roomId = uuidv4();
         const userId = uuidv4();
         
+        // Create initial user as host
         const user: User = {
             id: userId,
             username,
             isHost: true
         };
 
+        // Initialize room with host user
         const room: Room = {
             id: roomId,
             hostId: userId,
@@ -39,6 +42,7 @@ class RoomManagerImpl implements RoomManager {
             return null;
         }
 
+        // Create new user
         const userId = uuidv4();
         const user: User = {
             id: userId,
@@ -46,6 +50,7 @@ class RoomManagerImpl implements RoomManager {
             isHost: false
         };
 
+        // Add user to room
         room.users.push(user);
         console.log('User joined room:', { roomId, user });
         this.rooms.set(roomId, room);
@@ -60,17 +65,19 @@ class RoomManagerImpl implements RoomManager {
             return null;
         }
 
-        console.log('Before user leave:', room.users);
+        // Track users before and after removal
+        console.log('Users before leaving:', room.users);
         room.users = room.users.filter(user => user.id !== userId);
-        console.log('After user leave:', room.users);
+        console.log('Users after leaving:', room.users);
 
+        // Delete room if empty
         if (room.users.length === 0) {
-            console.log('Room empty, deleting:', roomId);
+            console.log('Room is empty, deleting:', roomId);
             this.rooms.delete(roomId);
             return null;
         }
 
-        // Eğer host ayrıldıysa, yeni host ata
+        // Assign new host if the host left
         if (userId === room.hostId && room.users.length > 0) {
             room.hostId = room.users[0].id;
             room.users[0].isHost = true;
@@ -89,6 +96,7 @@ class RoomManagerImpl implements RoomManager {
         const room = this.rooms.get(roomId);
         if (!room) return;
 
+        // Update video playback state
         room.isPlaying = videoState.isPlaying;
         room.currentTime = videoState.currentTime;
         console.log('Video state updated:', { roomId, videoState });
@@ -99,6 +107,7 @@ class RoomManagerImpl implements RoomManager {
         const room = this.rooms.get(roomId);
         if (!room) return;
 
+        // Reset video state with new URL
         room.videoUrl = url;
         room.currentTime = 0;
         room.isPlaying = false;
