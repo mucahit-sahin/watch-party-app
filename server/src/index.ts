@@ -101,9 +101,24 @@ io.on('connection', (socket) => {
 
     // Update video URL
     socket.on('video_url_change', ({ roomId, url }) => {
-        roomManager.updateVideoUrl(roomId, url);
-        io.to(roomId).emit('video_url_updated', url);
-        console.log('Video URL updated:', { roomId, url });
+        const room = roomManager.getRoom(roomId);
+        if (room) {
+            const user = room.users.find(u => u.id === userRoomMap.get(socket.id)?.userId);
+            roomManager.updateVideoUrl(roomId, url);
+            io.to(roomId).emit('video_url_updated', url);
+            
+            // Send system message about video URL change
+            io.to(roomId).emit('message_received', {
+                id: Date.now().toString(),
+                userId: '',
+                username: 'System',
+                content: `${user?.username} yeni bir video ekledi`,
+                messageType: 'system',
+                timestamp: Date.now()
+            });
+            
+            console.log('Video URL updated:', { roomId, url });
+        }
     });
 
     // Send message
