@@ -139,8 +139,26 @@ export const Room: React.FC = () => {
                 {/* Sol Panel - Kullanıcı Listesi */}
                 <Grid item xs={12} md={3}>
                     <Paper sx={{ p: 2, height: '100%' }}>
-                        <Typography variant="h6" gutterBottom>
-                            Katılımcılar
+                        <Typography variant="h6" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>Katılımcılar</span>
+                            <Box
+                                component="span"
+                                sx={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    minWidth: '24px',
+                                    height: '24px',
+                                    borderRadius: '12px',
+                                    bgcolor: 'primary.main',
+                                    color: 'primary.contrastText',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 'bold',
+                                    px: 1
+                                }}
+                            >
+                                {room?.users.length || 0}
+                            </Box>
                         </Typography>
                         <List>
                             {room?.users.map((user: User) => (
