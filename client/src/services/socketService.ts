@@ -61,12 +61,19 @@ class SocketService {
     }
 
     joinRoom(roomId: string, username: string, callback: (room: Room | null) => void) {
-        const socket = this.connect();
-        console.log('Joining room:', roomId, 'as user:', username);
-        socket?.emit('join_room', { roomId, username }, (response: Room | null) => {
-            console.log('Join room response:', response);
-            callback(response);
-        });
+        if (this.socket) {
+            this.socket.emit('joinRoom', { roomId, username }, callback);
+        } else {
+            callback(null);
+        }
+    }
+
+    getRoomInfo(roomId: string, callback: (room: Room | null) => void) {
+        if (this.socket) {
+            this.socket.emit('getRoomInfo', { roomId }, callback);
+        } else {
+            callback(null);
+        }
     }
 
     leaveRoom(roomId: string, userId: string) {

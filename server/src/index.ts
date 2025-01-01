@@ -37,7 +37,7 @@ io.on('connection', (socket) => {
     });
 
     // Join room
-    socket.on('join_room', ({ roomId, username }, callback) => {
+    socket.on('joinRoom', ({ roomId, username }, callback) => {
         const room = roomManager.joinRoom(roomId, username);
         if (room) {
             socket.join(roomId);
@@ -46,15 +46,25 @@ io.on('connection', (socket) => {
             userRoomMap.set(socket.id, { roomId, userId: joinedUser.id });
             callback(room);
             io.to(roomId).emit('user_joined', room);
-            // Send current video URL to the new user
+            // Send current video URL and state to the new user
             if (room.videoUrl) {
                 socket.emit('video_url_updated', room.videoUrl);
+                socket.emit('video_state_updated', {
+                    isPlaying: room.isPlaying,
+                    currentTime: room.currentTime,
+                    duration: 0,
+                    buffered: 0
+                });
             }
-            console.log('User joined room:', { roomId, username, room });
         } else {
             callback(null);
-            console.log('Room not found:', roomId);
         }
+    });
+
+    // Get room info
+    socket.on('getRoomInfo', ({ roomId }, callback) => {
+        const room = roomManager.getRoom(roomId);
+        callback(room);
     });
 
     // Leave room

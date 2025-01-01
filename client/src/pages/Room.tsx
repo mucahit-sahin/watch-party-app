@@ -12,7 +12,11 @@ import {
     ListItem,
     ListItemText,
     ListItemIcon,
-    Divider
+    Divider,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 import { Person } from '@mui/icons-material';
 import { VideoPlayer } from '../components/VideoPlayer';
@@ -29,6 +33,9 @@ export const Room: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [videoUrl, setVideoUrl] = useState('');
     const [newVideoUrl, setNewVideoUrl] = useState('');
+    const [showUsernameDialog, setShowUsernameDialog] = useState(false);
+    const [username, setUsername] = useState('');
+    const [usernameError, setUsernameError] = useState('');
     const [videoState, setVideoState] = useState<VideoState>({
         isPlaying: false,
         currentTime: 0,
@@ -42,7 +49,22 @@ export const Room: React.FC = () => {
             return;
         }
 
-        // Socket bağlantısını oluştur
+        // Eğer location state'den room bilgisi gelmemişse, kullanıcı adı modalını göster
+        if (!location.state?.room) {
+            setShowUsernameDialog(true);
+        } else {
+            const roomFromState = location.state.room as RoomType;
+            setRoom(roomFromState);
+            const hostUser = roomFromState.users.find(u => u.isHost);
+            if (hostUser) {
+                setCurrentUser(hostUser);
+            }
+            // Eğer odada video URL'si varsa, onu da ayarla
+            if (roomFromState.videoUrl) {
+                setVideoUrl(roomFromState.videoUrl);
+            }
+        }
+
         const socket = socketService.connect();
 
         // Oda ve kullanıcı bilgilerini location state'inden al
@@ -69,6 +91,10 @@ export const Room: React.FC = () => {
                     console.log('Updating current user:', updatedUser);
                     setCurrentUser(updatedUser);
                 }
+            }
+            // Eğer odada video URL'si varsa, onu da güncelle
+            if (updatedRoom.videoUrl) {
+                setVideoUrl(updatedRoom.videoUrl);
             }
         };
 
@@ -131,110 +157,162 @@ export const Room: React.FC = () => {
         }
     };
 
+    const handleJoinRoom = () => {
+        if (!username.trim()) {
+            setUsernameError('Lütfen bir kullanıcı adı girin');
+            return;
+        }
+
+        socketService.joinRoom(roomId!, username, (joinedRoom) => {
+            if (joinedRoom) {
+                setRoom(joinedRoom);
+                const joinedUser = joinedRoom.users.find(u => u.username === username);
+                if (joinedUser) {
+                    setCurrentUser(joinedUser);
+                }
+                setShowUsernameDialog(false);
+            } else {
+                setUsernameError('Odaya katılırken bir hata oluştu');
+            }
+        });
+    };
+
     const isHost = currentUser?.isHost || false;
 
+    if (!roomId) return null;
+
     return (
-        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-                {/* Left Panel - User List */}
-                <Grid item xs={12} md={3}>
-                    <Paper sx={{ p: 2, height: '100%' }}>
-                        <Typography variant="h6" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span>Participants</span>
-                            <Box
-                                component="span"
-                                sx={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    minWidth: '24px',
-                                    height: '24px',
-                                    borderRadius: '12px',
-                                    bgcolor: 'primary.main',
-                                    color: 'primary.contrastText',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 'bold',
-                                    px: 1
-                                }}
-                            >
-                                {room?.users.length || 0}
-                            </Box>
-                        </Typography>
-                        <List>
-                            {room?.users.map((user: User) => (
-                                <ListItem key={user.id}>
-                                    <ListItemIcon>
-                                        <Person />
-                                    </ListItemIcon>
-                                    <ListItemText 
-                                        primary={user.username}
-                                        secondary={user.isHost ? '(Host)' : ''}
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Paper>
-                </Grid>
+        <>
+            <Dialog open={showUsernameDialog} onClose={() => navigate('/')} maxWidth="xs" fullWidth>
+                <DialogTitle>Odaya Katıl</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                        Odaya katılmak için lütfen bir kullanıcı adı girin
+                    </Typography>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Kullanıcı Adı"
+                        fullWidth
+                        value={username}
+                        onChange={(e) => {
+                            setUsername(e.target.value);
+                            setUsernameError('');
+                        }}
+                        error={!!usernameError}
+                        helperText={usernameError}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => navigate('/')}>İptal</Button>
+                    <Button onClick={handleJoinRoom} variant="contained">
+                        Katıl
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
-                {/* Center Panel - Video Player */}
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 2 }}>
-                        {isHost && (
-                            <Box sx={{ mb: 2 }}>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    label="Video URL"
-                                    value={newVideoUrl}
-                                    onChange={(e) => setNewVideoUrl(e.target.value)}
-                                    sx={{ mr: 1 }}
-                                />
-                                <Button
-                                    variant="contained"
-                                    onClick={handleUpdateVideoUrl}
-                                    disabled={!newVideoUrl}
-                                    sx={{ mt: 1 }}
+            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+                <Grid container spacing={3}>
+                    {/* Left Panel - User List */}
+                    <Grid item xs={12} md={3}>
+                        <Paper sx={{ p: 2, height: '100%' }}>
+                            <Typography variant="h6" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>Participants</span>
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        minWidth: '24px',
+                                        height: '24px',
+                                        borderRadius: '12px',
+                                        bgcolor: 'primary.main',
+                                        color: 'primary.contrastText',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 'bold',
+                                        px: 1
+                                    }}
                                 >
-                                    Change Video
-                                </Button>
-                            </Box>
-                        )}
-                        
-                        <Divider sx={{ my: 2 }} />
-                        
-                        {videoUrl ? (
-                            <VideoPlayer
-                                url={videoUrl}
-                                videoState={videoState}
-                                onStateChange={handleVideoStateChange}
-                                isHost={isHost}
-                            />
-                        ) : (
-                            <Box sx={{ 
-                                height: 400, 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                justifyContent: 'center',
-                                bgcolor: 'grey.100'
-                            }}>
-                                <Typography variant="h6" color="text.secondary">
-                                    Waiting for video URL...
-                                </Typography>
-                            </Box>
-                        )}
-                    </Paper>
-                </Grid>
+                                    {room?.users.length || 0}
+                                </Box>
+                            </Typography>
+                            <List>
+                                {room?.users.map((user: User) => (
+                                    <ListItem key={user.id}>
+                                        <ListItemIcon>
+                                            <Person />
+                                        </ListItemIcon>
+                                        <ListItemText 
+                                            primary={user.username}
+                                            secondary={user.isHost ? '(Host)' : ''}
+                                        />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Paper>
+                    </Grid>
 
-                {/* Right Panel - Chat */}
-                <Grid item xs={12} md={3}>
-                    <Box sx={{ height: '70vh' }}>
-                        <Chat
-                            messages={messages}
-                            onSendMessage={handleSendMessage}
-                        />
-                    </Box>
+                    {/* Center Panel - Video Player */}
+                    <Grid item xs={12} md={6}>
+                        <Paper sx={{ p: 2 }}>
+                            {isHost && (
+                                <Box sx={{ mb: 2 }}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Video URL"
+                                        value={newVideoUrl}
+                                        onChange={(e) => setNewVideoUrl(e.target.value)}
+                                        sx={{ mr: 1 }}
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleUpdateVideoUrl}
+                                        disabled={!newVideoUrl}
+                                        sx={{ mt: 1 }}
+                                    >
+                                        Change Video
+                                    </Button>
+                                </Box>
+                            )}
+                            
+                            <Divider sx={{ my: 2 }} />
+                            
+                            {videoUrl ? (
+                                <VideoPlayer
+                                    url={videoUrl}
+                                    videoState={videoState}
+                                    onStateChange={handleVideoStateChange}
+                                    isHost={isHost}
+                                />
+                            ) : (
+                                <Box sx={{ 
+                                    height: 400, 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    bgcolor: 'grey.100'
+                                }}>
+                                    <Typography variant="h6" color="text.secondary">
+                                        Waiting for video URL...
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Paper>
+                    </Grid>
+
+                    {/* Right Panel - Chat */}
+                    <Grid item xs={12} md={3}>
+                        <Box sx={{ height: '70vh' }}>
+                            <Chat
+                                messages={messages}
+                                onSendMessage={handleSendMessage}
+                            />
+                        </Box>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Container>
+            </Container>
+        </>
     );
 }; 
