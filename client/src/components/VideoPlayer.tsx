@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
-import { Box, IconButton, Slider, CircularProgress } from '@mui/material';
-import { PlayArrow, Pause, Fullscreen, FullscreenExit } from '@mui/icons-material';
+import { Box, IconButton, Slider, CircularProgress, Menu, MenuItem } from '@mui/material';
+import { PlayArrow, Pause, Fullscreen, FullscreenExit, Speed } from '@mui/icons-material';
 import { VideoState } from '../types/types';
 
 interface VideoPlayerProps {
@@ -10,6 +10,8 @@ interface VideoPlayerProps {
     onStateChange: (state: VideoState) => void;
     isHost: boolean;
 }
+
+const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     url,
@@ -24,6 +26,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [localTime, setLocalTime] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isBuffering, setIsBuffering] = useState(false);
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
+    const [speedMenuAnchor, setSpeedMenuAnchor] = useState<null | HTMLElement>(null);
 
     useEffect(() => {
         if (!isDragging && !seekingRef.current && playerRef.current) {
@@ -120,6 +124,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         setIsBuffering(false);
     };
 
+    const handleSpeedMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setSpeedMenuAnchor(event.currentTarget);
+    };
+
+    const handleSpeedMenuClose = () => {
+        setSpeedMenuAnchor(null);
+    };
+
+    const handleSpeedChange = (speed: number) => {
+        setPlaybackSpeed(speed);
+        handleSpeedMenuClose();
+    };
+
     return (
         <Box ref={containerRef} sx={{ width: '100%', position: 'relative' }}>
             <ReactPlayer
@@ -128,6 +145,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 width="100%"
                 height={isFullscreen ? '100vh' : 'auto'}
                 playing={videoState.isPlaying}
+                playbackRate={playbackSpeed}
                 onPlay={handlePlay}
                 onPause={handlePause}
                 onProgress={handleProgress}
@@ -200,6 +218,38 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         }}
                     />
                 </Box>
+
+                <IconButton
+                    onClick={handleSpeedMenuOpen}
+                    disabled={!isHost}
+                    sx={{ color: 'white', mr: 1 }}
+                >
+                    <Speed />
+                </IconButton>
+
+                <Menu
+                    anchorEl={speedMenuAnchor}
+                    open={Boolean(speedMenuAnchor)}
+                    onClose={handleSpeedMenuClose}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                >
+                    {PLAYBACK_SPEEDS.map((speed) => (
+                        <MenuItem
+                            key={speed}
+                            onClick={() => handleSpeedChange(speed)}
+                            selected={speed === playbackSpeed}
+                        >
+                            {speed}x
+                        </MenuItem>
+                    ))}
+                </Menu>
 
                 <IconButton
                     onClick={handleFullscreen}
