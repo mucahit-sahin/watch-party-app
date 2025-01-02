@@ -2,6 +2,16 @@
 
 Watch Party is a web application that allows you to watch videos simultaneously with your friends. The application provides a shared movie/video watching experience with your remote friends by synchronizing video playback controls.
 
+## 🚀 Screenshots
+
+### Home Page
+![Home Page](screenshots/home.png)
+*Create a new room or join an existing one*
+
+### Watch Room
+![Watch Room](screenshots/room.png)
+*Watch videos together with real-time chat and synchronization*
+
 ## 🚀 Features
 
 - ✨ Real-time video synchronization

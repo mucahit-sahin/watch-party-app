@@ -66,6 +66,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                                         component="span"
                                         variant="body2"
                                         color="text.secondary"
+                                        sx={{ mr: 1 }}
                                     >
                                         {message.messageType === 'system' ? '' : message.username}
                                     </Typography>
@@ -76,7 +77,9 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                                         variant="body1"
                                         color={message.messageType === 'system' ? 'text.secondary' : 'text.primary'}
                                         sx={{
-                                            fontStyle: message.messageType === 'system' ? 'italic' : 'normal'
+                                            fontStyle: message.messageType === 'system' ? 'italic' : 'normal',
+                                            display: 'block',
+                                            mt: 0.5
                                         }}
                                     >
                                         {message.content}
