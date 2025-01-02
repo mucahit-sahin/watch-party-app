@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
-import { Box, IconButton, LinearProgress } from '@mui/material';
+import { Box, IconButton, Slider, CircularProgress } from '@mui/material';
 import { PlayArrow, Pause, Fullscreen, FullscreenExit } from '@mui/icons-material';
 import { VideoState } from '../types/types';
 
@@ -21,15 +21,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const seekingRef = useRef(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [localTime, setLocalTime] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isBuffering, setIsBuffering] = useState(false);
 
     useEffect(() => {
-        if (!seekingRef.current && playerRef.current) {
+        if (!isDragging && !seekingRef.current && playerRef.current) {
             const diff = Math.abs(playerRef.current.getCurrentTime() - videoState.currentTime);
             if (diff > 1) {
                 playerRef.current.seekTo(videoState.currentTime, 'seconds');
             }
+            setLocalTime(videoState.currentTime);
         }
-    }, [videoState.currentTime]);
+    }, [videoState.currentTime, isDragging]);
 
     const handlePlay = () => {
         if (isHost) {
@@ -44,12 +48,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     const handleProgress = (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => {
-        if (!seekingRef.current && isHost) {
+        if (!seekingRef.current && !isDragging && isHost) {
             onStateChange({
                 ...videoState,
                 currentTime: state.playedSeconds,
                 buffered: state.loadedSeconds
             });
+            setLocalTime(state.playedSeconds);
         }
     };
 
@@ -90,6 +95,31 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         };
     }, []);
 
+    const handleSliderChange = (_event: Event, newValue: number | number[]) => {
+        if (isHost) {
+            const newTime = ((newValue as number) * videoState.duration) / 100;
+            setLocalTime(newTime);
+        }
+    };
+
+    const handleSliderChangeCommitted = (_event: Event | React.SyntheticEvent, newValue: number | number[]) => {
+        if (isHost) {
+            const newTime = ((newValue as number) * videoState.duration) / 100;
+            handleSeek(newTime);
+            if (playerRef.current) {
+                playerRef.current.seekTo(newTime, 'seconds');
+            }
+        }
+    };
+
+    const handleBuffer = () => {
+        setIsBuffering(true);
+    };
+
+    const handleBufferEnd = () => {
+        setIsBuffering(false);
+    };
+
     return (
         <Box ref={containerRef} sx={{ width: '100%', position: 'relative' }}>
             <ReactPlayer
@@ -103,8 +133,29 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 onProgress={handleProgress}
                 onDuration={handleDuration}
                 onSeek={handleSeek}
+                onBuffer={handleBuffer}
+                onBufferEnd={handleBufferEnd}
                 controls={false}
             />
+            
+            {isBuffering && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        bgcolor: 'rgba(0, 0, 0, 0.5)',
+                        borderRadius: '50%',
+                        padding: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <CircularProgress sx={{ color: 'white' }} size={60} />
+                </Box>
+            )}
             
             <Box sx={{ 
                 position: 'absolute', 
@@ -125,10 +176,28 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </IconButton>
                 
                 <Box sx={{ flex: 1, mx: 2 }}>
-                    <LinearProgress
-                        variant="determinate"
-                        value={(videoState.currentTime / videoState.duration) * 100}
-                        sx={{ height: 8, borderRadius: 4 }}
+                    <Slider
+                        value={(localTime / videoState.duration) * 100}
+                        onChange={handleSliderChange}
+                        onChangeCommitted={handleSliderChangeCommitted}
+                        onMouseDown={() => setIsDragging(true)}
+                        onMouseUp={() => setIsDragging(false)}
+                        disabled={!isHost}
+                        sx={{
+                            color: 'white',
+                            height: 8,
+                            '& .MuiSlider-thumb': {
+                                width: 16,
+                                height: 16,
+                                transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                                '&:hover': {
+                                    boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.16)',
+                                },
+                            },
+                            '& .MuiSlider-rail': {
+                                opacity: 0.28,
+                            },
+                        }}
                     />
                 </Box>
 
