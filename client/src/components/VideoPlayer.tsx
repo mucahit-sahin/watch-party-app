@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { Box, IconButton, LinearProgress } from '@mui/material';
-import { PlayArrow, Pause } from '@mui/icons-material';
+import { PlayArrow, Pause, Fullscreen, FullscreenExit } from '@mui/icons-material';
 import { VideoState } from '../types/types';
 
 interface VideoPlayerProps {
@@ -18,7 +18,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     isHost
 }) => {
     const playerRef = useRef<ReactPlayer>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const seekingRef = useRef(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     useEffect(() => {
         if (!seekingRef.current && playerRef.current) {
@@ -67,13 +69,34 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }, 1000);
     };
 
+    const handleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            containerRef.current?.requestFullscreen();
+            setIsFullscreen(true);
+        } else {
+            document.exitFullscreen();
+            setIsFullscreen(false);
+        }
+    };
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        };
+    }, []);
+
     return (
-        <Box sx={{ width: '100%', position: 'relative' }}>
+        <Box ref={containerRef} sx={{ width: '100%', position: 'relative' }}>
             <ReactPlayer
                 ref={playerRef}
                 url={url}
                 width="100%"
-                height="auto"
+                height={isFullscreen ? '100vh' : 'auto'}
                 playing={videoState.isPlaying}
                 onPlay={handlePlay}
                 onPause={handlePause}
@@ -108,6 +131,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         sx={{ height: 8, borderRadius: 4 }}
                     />
                 </Box>
+
+                <IconButton
+                    onClick={handleFullscreen}
+                    sx={{ color: 'white' }}
+                >
+                    {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
+                </IconButton>
             </Box>
         </Box>
     );
