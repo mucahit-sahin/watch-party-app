@@ -26,7 +26,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [localTime, setLocalTime] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isBuffering, setIsBuffering] = useState(false);
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [speedMenuAnchor, setSpeedMenuAnchor] = useState<null | HTMLElement>(null);
     const [volume, setVolume] = useState(1);
     const [prevVolume, setPrevVolume] = useState(1);
@@ -136,7 +135,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     const handleSpeedChange = (speed: number) => {
-        setPlaybackSpeed(speed);
+        if (isHost) {
+            onStateChange({ ...videoState, playbackSpeed: speed });
+        }
         handleSpeedMenuClose();
     };
 
@@ -171,7 +172,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 width="100%"
                 height={isFullscreen ? '100vh' : 'auto'}
                 playing={videoState.isPlaying}
-                playbackRate={playbackSpeed}
+                playbackRate={videoState.playbackSpeed}
                 volume={volume}
                 onPlay={handlePlay}
                 onPause={handlePause}
@@ -315,7 +316,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         <MenuItem
                             key={speed}
                             onClick={() => handleSpeedChange(speed)}
-                            selected={speed === playbackSpeed}
+                            selected={speed === videoState.playbackSpeed}
                         >
                             {speed}x
                         </MenuItem>

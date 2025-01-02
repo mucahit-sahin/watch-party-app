@@ -40,7 +40,8 @@ export const Room: React.FC = () => {
         isPlaying: false,
         currentTime: 0,
         duration: 0,
-        buffered: 0
+        buffered: 0,
+        playbackSpeed: 1
     });
 
     useEffect(() => {

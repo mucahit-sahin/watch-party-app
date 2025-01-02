@@ -29,4 +29,5 @@ export interface VideoState {
     currentTime: number;
     duration: number;
     buffered: number;
+    playbackSpeed: number;
 } 
