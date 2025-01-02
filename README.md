@@ -94,8 +94,16 @@ yarn dev
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 📞 Contact
+## 📞 Contact & Social Media
 
-Project Owner - [@github_username](https://github.com/mucahit-sahin)
+- **GitHub:** [@mucahit-sahin](https://github.com/mucahit-sahin)
+- **Project Repository:** [watch-party-app](https://github.com/mucahit-sahin/watch-party-app)
 
-Project Link: [https://github.com/username/watch-party-app](https://github.com/mucahit-sahin/watch-party-app) 
+<div align="center">
+  <a href="https://github.com/mucahit-sahin">
+    <img src="https://img.shields.io/github/followers/mucahit-sahin?label=Follow&style=social" alt="GitHub followers"/>
+  </a>
+  <a href="https://github.com/mucahit-sahin/watch-party-app">
+    <img src="https://img.shields.io/github/stars/mucahit-sahin/watch-party-app?style=social" alt="GitHub stars"/>
+  </a>
+</div> 

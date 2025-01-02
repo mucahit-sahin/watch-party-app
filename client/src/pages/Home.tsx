@@ -7,9 +7,11 @@ import {
     TextField, 
     Button, 
     Paper,
-    Divider
+    Divider,
+    IconButton
 } from '@mui/material';
 import { socketService } from '../services/socketService';
+import { GitHub } from '@mui/icons-material';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -74,6 +76,32 @@ export const Home: React.FC = () => {
                     <Typography variant="body1" align="center" color="text.secondary" paragraph>
                         Watch videos together with your friends
                     </Typography>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3 }}>
+                        <IconButton
+                            href="https://github.com/mucahit-sahin"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            color="inherit"
+                            sx={{ '&:hover': { color: 'primary.main' } }}
+                        >
+                            <GitHub />
+                        </IconButton>
+                        <Typography
+                            component="a"
+                            href="https://github.com/mucahit-sahin"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                                textDecoration: 'none',
+                                color: 'text.secondary',
+                                '&:hover': { color: 'primary.main' },
+                                ml: 1
+                            }}
+                        >
+                            @mucahit-sahin
+                        </Typography>
+                    </Box>
 
                     <Box component="form" sx={{ mt: 2 }}>
                         <TextField
