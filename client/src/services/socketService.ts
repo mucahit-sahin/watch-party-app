@@ -108,6 +108,19 @@ class SocketService {
         });
     }
 
+    // Kick user
+    kickUser(roomId: string, userId: string) {
+        console.log('Kicking user:', userId, 'from room:', roomId);
+        this.socket?.emit('kick_user', { roomId, userId });
+    }
+
+    onKicked(callback: () => void) {
+        this.socket?.on('kicked', () => {
+            console.log('You have been kicked from the room');
+            callback();
+        });
+    }
+
     removeAllListeners() {
         if (this.socket) {
             console.log('Removing all listeners');

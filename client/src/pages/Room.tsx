@@ -18,9 +18,12 @@ import {
     DialogContent,
     DialogActions,
     Tabs,
-    Tab
+    Tab,
+    IconButton,
+    Snackbar,
+    Alert
 } from '@mui/material';
-import { Person, Chat as ChatIcon, People } from '@mui/icons-material';
+import { Person, Chat as ChatIcon, People, PersonRemove } from '@mui/icons-material';
 import { VideoPlayer } from '../components/VideoPlayer';
 import { Chat } from '../components/Chat';
 import { socketService } from '../services/socketService';
@@ -71,6 +74,7 @@ export const Room: React.FC = () => {
         playbackSpeed: 1
     });
     const [tabValue, setTabValue] = useState(0);
+    const [kickAlert, setKickAlert] = useState(false);
 
     useEffect(() => {
         if (!roomId) {
@@ -148,6 +152,14 @@ export const Room: React.FC = () => {
         socketService.onUserJoined(handleRoomUpdate);
         socketService.onUserLeft(handleRoomUpdate);
 
+        // Kicked event listener
+        socketService.onKicked(() => {
+            setKickAlert(true);
+            setTimeout(() => {
+                navigate('/', { replace: true });
+            }, 2000);
+        });
+
         // Cleanup function
         return () => {
             if (roomId && currentUser) {
@@ -213,12 +225,32 @@ export const Room: React.FC = () => {
         setTabValue(newValue);
     };
 
+    const handleKickUser = (userId: string) => {
+        if (roomId && isHost) {
+            socketService.kickUser(roomId, userId);
+        }
+    };
+
     if (!roomId) return null;
 
     const ParticipantsList = () => (
         <List>
             {room?.users.map((user: User) => (
-                <ListItem key={user.id}>
+                <ListItem
+                    key={user.id}
+                    secondaryAction={
+                        isHost && user.id !== currentUser?.id ? (
+                            <IconButton
+                                edge="end"
+                                aria-label="kick"
+                                onClick={() => handleKickUser(user.id)}
+                                sx={{ color: 'error.main' }}
+                            >
+                                <PersonRemove />
+                            </IconButton>
+                        ) : null
+                    }
+                >
                     <ListItemIcon>
                         <Person />
                     </ListItemIcon>
@@ -369,6 +401,16 @@ export const Room: React.FC = () => {
                     </Grid>
                 </Grid>
             </Container>
+
+            <Snackbar
+                open={kickAlert}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                autoHideDuration={2000}
+            >
+                <Alert severity="error" variant="filled">
+                    You have been kicked from the room by the host
+                </Alert>
+            </Snackbar>
         </>
     );
 }; 

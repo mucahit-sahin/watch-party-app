@@ -137,6 +137,49 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('message_received', messageWithTimestamp);
         console.log('Message sent:', { roomId, message: messageWithTimestamp });
     });
+
+    // Kick user event handler
+    socket.on('kick_user', ({ roomId, userId }) => {
+        const room = roomManager.getRoom(roomId);
+        if (room) {
+            // Kullanıcıyı odadan çıkar
+            const kickedUser = room.users.find((u: { id: string }) => u.id === userId);
+            if (kickedUser) {
+                // Kicklenen kullanıcının socket bilgisini bul
+                const kickedSocketId = Array.from(userRoomMap.entries())
+                    .find(([_, info]) => info.userId === userId)?.[0];
+
+                if (kickedSocketId) {
+                    // Kicklenen kullanıcının socket'ine kicked event'ini gönder
+                    const kickedSocket = io.sockets.sockets.get(kickedSocketId);
+                    if (kickedSocket) {
+                        kickedSocket.emit('kicked');
+                        kickedSocket.leave(roomId);
+                    }
+
+                    // Kullanıcıyı odadan çıkar
+                    const updatedRoom = roomManager.leaveRoom(roomId, userId);
+                    if (updatedRoom) {
+                        // Odadaki diğer kullanıcılara güncel oda bilgisini gönder
+                        io.to(roomId).emit('user_left', updatedRoom);
+                        
+                        // System message gönder
+                        io.to(roomId).emit('message_received', {
+                            id: Date.now().toString(),
+                            userId: '',
+                            username: 'System',
+                            content: `${kickedUser.username} has been kicked from the room`,
+                            messageType: 'system',
+                            timestamp: Date.now()
+                        });
+                    }
+
+                    // User-room map'ten kullanıcıyı sil
+                    userRoomMap.delete(kickedSocketId);
+                }
+            }
+        }
+    });
 });
 
 // Function to handle user leaving
