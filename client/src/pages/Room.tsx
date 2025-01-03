@@ -16,13 +16,40 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    Tabs,
+    Tab
 } from '@mui/material';
-import { Person } from '@mui/icons-material';
+import { Person, Chat as ChatIcon, People } from '@mui/icons-material';
 import { VideoPlayer } from '../components/VideoPlayer';
 import { Chat } from '../components/Chat';
 import { socketService } from '../services/socketService';
 import { Room as RoomType, Message, VideoState, User } from '../types/types';
+
+interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            {...other}
+            style={{ height: '100%' }}
+        >
+            {value === index && (
+                <Box sx={{ height: '100%' }}>
+                    {children}
+                </Box>
+            )}
+        </div>
+    );
+}
 
 export const Room: React.FC = () => {
     const { roomId } = useParams<{ roomId: string }>();
@@ -43,6 +70,7 @@ export const Room: React.FC = () => {
         buffered: 0,
         playbackSpeed: 1
     });
+    const [tabValue, setTabValue] = useState(0);
 
     useEffect(() => {
         if (!roomId) {
@@ -181,7 +209,27 @@ export const Room: React.FC = () => {
 
     const isHost = currentUser?.isHost || false;
 
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
+    };
+
     if (!roomId) return null;
+
+    const ParticipantsList = () => (
+        <List>
+            {room?.users.map((user: User) => (
+                <ListItem key={user.id}>
+                    <ListItemIcon>
+                        <Person />
+                    </ListItemIcon>
+                    <ListItemText 
+                        primary={user.username}
+                        secondary={user.isHost ? '(Host)' : ''}
+                    />
+                </ListItem>
+            ))}
+        </List>
+    );
 
     return (
         <>
@@ -213,84 +261,61 @@ export const Room: React.FC = () => {
                 </DialogActions>
             </Dialog>
 
-            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-                <Grid container spacing={3}>
-                    {/* Left Panel - User List */}
-                    <Grid item xs={12} md={3}>
-                        <Paper sx={{ p: 2, height: '100%' }}>
-                            <Typography variant="h6" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span>Participants</span>
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        minWidth: '24px',
-                                        height: '24px',
-                                        borderRadius: '12px',
-                                        bgcolor: 'primary.main',
-                                        color: 'primary.contrastText',
-                                        fontSize: '0.75rem',
-                                        fontWeight: 'bold',
-                                        px: 1
-                                    }}
-                                >
-                                    {room?.users.length || 0}
-                                </Box>
-                            </Typography>
-                            <List>
-                                {room?.users.map((user: User) => (
-                                    <ListItem key={user.id}>
-                                        <ListItemIcon>
-                                            <Person />
-                                        </ListItemIcon>
-                                        <ListItemText 
-                                            primary={user.username}
-                                            secondary={user.isHost ? '(Host)' : ''}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </Paper>
-                    </Grid>
-
-                    {/* Center Panel - Video Player */}
-                    <Grid item xs={12} md={6}>
-                        <Paper sx={{ p: 2 }}>
+            <Container maxWidth="xl" sx={{ mt: 2, mb: 2, height: 'calc(100vh - 32px)' }}>
+                <Grid container spacing={2} sx={{ height: '100%' }}>
+                    {/* Left Panel - Video Player */}
+                    <Grid item xs={12} md={9} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        <Paper sx={{ p: 2, mb: 2 }}>
                             {isHost && (
-                                <Box sx={{ mb: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <TextField
-                                        fullWidth
                                         size="small"
                                         label="Video URL"
                                         value={newVideoUrl}
                                         onChange={(e) => setNewVideoUrl(e.target.value)}
-                                        sx={{ mr: 1 }}
+                                        sx={{ flex: 1 }}
                                     />
                                     <Button
                                         variant="contained"
                                         onClick={handleUpdateVideoUrl}
                                         disabled={!newVideoUrl}
-                                        sx={{ mt: 1 }}
                                     >
                                         Change Video
                                     </Button>
                                 </Box>
                             )}
-                            
-                            <Divider sx={{ my: 2 }} />
-                            
+                        </Paper>
+                        
+                        <Paper sx={{ 
+                            p: 2, 
+                            flex: 1, 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            minHeight: 0 // Bu önemli, flex child'ın taşmasını önler
+                        }}>
                             {videoUrl ? (
-                                <VideoPlayer
-                                    url={videoUrl}
-                                    videoState={videoState}
-                                    onStateChange={handleVideoStateChange}
-                                    isHost={isHost}
-                                />
+                                <Box sx={{ 
+                                    flex: 1,
+                                    position: 'relative',
+                                    minHeight: 0, // Bu önemli, flex child'ın taşmasını önler
+                                    '& > div': { 
+                                        position: 'absolute !important',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0
+                                    }
+                                }}>
+                                    <VideoPlayer
+                                        url={videoUrl}
+                                        videoState={videoState}
+                                        onStateChange={handleVideoStateChange}
+                                        isHost={isHost}
+                                    />
+                                </Box>
                             ) : (
                                 <Box sx={{ 
-                                    height: 400, 
+                                    flex: 1,
                                     display: 'flex', 
                                     alignItems: 'center', 
                                     justifyContent: 'center',
@@ -304,14 +329,43 @@ export const Room: React.FC = () => {
                         </Paper>
                     </Grid>
 
-                    {/* Right Panel - Chat */}
-                    <Grid item xs={12} md={3}>
-                        <Box sx={{ height: '70vh' }}>
-                            <Chat
-                                messages={messages}
-                                onSendMessage={handleSendMessage}
-                            />
-                        </Box>
+                    {/* Right Panel - Tabs */}
+                    <Grid item xs={12} md={3} sx={{ height: '100%' }}>
+                        <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Tabs
+                                value={tabValue}
+                                onChange={handleTabChange}
+                                variant="fullWidth"
+                                sx={{ borderBottom: 1, borderColor: 'divider' }}
+                            >
+                                <Tab 
+                                    icon={<ChatIcon />} 
+                                    label="Chat"
+                                    sx={{ minHeight: 64 }}
+                                />
+                                <Tab 
+                                    icon={<People />} 
+                                    label={`Participants (${room?.users.length || 0})`}
+                                    sx={{ minHeight: 64 }}
+                                />
+                            </Tabs>
+
+                            <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                                <TabPanel value={tabValue} index={0}>
+                                    <Box sx={{ height: '100%' }}>
+                                        <Chat
+                                            messages={messages}
+                                            onSendMessage={handleSendMessage}
+                                        />
+                                    </Box>
+                                </TabPanel>
+                                <TabPanel value={tabValue} index={1}>
+                                    <Box sx={{ height: '100%', overflow: 'auto' }}>
+                                        <ParticipantsList />
+                                    </Box>
+                                </TabPanel>
+                            </Box>
+                        </Paper>
                     </Grid>
                 </Grid>
             </Container>
