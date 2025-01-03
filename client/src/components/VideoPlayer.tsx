@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
-import { Box, IconButton, Slider, CircularProgress, Menu, MenuItem } from '@mui/material';
+import { Box, IconButton, Slider, CircularProgress, Menu, MenuItem, Typography } from '@mui/material';
 import { PlayArrow, Pause, Fullscreen, FullscreenExit, Speed, VolumeUp, VolumeDown, VolumeOff } from '@mui/icons-material';
 import { VideoState } from '../types/types';
 
@@ -12,6 +12,17 @@ interface VideoPlayerProps {
 }
 
 const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
+const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     url,
@@ -221,7 +232,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     {videoState.isPlaying ? <Pause /> : <PlayArrow />}
                 </IconButton>
                 
-                <Box sx={{ flex: 1, mx: 2 }}>
+                <Box sx={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    flex: 1,
+                    mx: 2 
+                }}>
+                    <Typography variant="body2" sx={{ color: 'white', minWidth: 45 }}>
+                        {formatTime(localTime)}
+                    </Typography>
+                    
                     <Slider
                         value={(localTime / videoState.duration) * 100}
                         onChange={handleSliderChange}
@@ -232,6 +252,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         sx={{
                             color: 'white',
                             height: 8,
+                            mx: 2,
                             '& .MuiSlider-thumb': {
                                 width: 16,
                                 height: 16,
@@ -245,6 +266,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             },
                         }}
                     />
+
+                    <Typography variant="body2" sx={{ color: 'white', minWidth: 45 }}>
+                        {formatTime(videoState.duration)}
+                    </Typography>
                 </Box>
 
                 <Box
