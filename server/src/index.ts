@@ -44,14 +44,22 @@ io.on('connection', (socket) => {
 
     // Join room
     socket.on('joinRoom', ({ roomId, username }, callback) => {
-        const room = roomManager.joinRoom(roomId, username);
-        if (room) {
+        const room = roomManager.getRoom(roomId);
+        
+        // Odada aynı kullanıcı adı var mı kontrol et
+        if (room && room.users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
+            callback({ error: 'Username already exists in this room' });
+            return;
+        }
+
+        const updatedRoom = roomManager.joinRoom(roomId, username);
+        if (updatedRoom) {
             socket.join(roomId);
             // Save user information
-            const joinedUser = room.users[room.users.length - 1];
+            const joinedUser = updatedRoom.users[updatedRoom.users.length - 1];
             userRoomMap.set(socket.id, { roomId, userId: joinedUser.id });
-            callback(room);
-            io.to(roomId).emit('user_joined', room);
+            callback({ room: updatedRoom });
+            io.to(roomId).emit('user_joined', updatedRoom);
 
             // Send system message about user joining
             io.to(roomId).emit('message_received', {
@@ -64,17 +72,17 @@ io.on('connection', (socket) => {
             });
 
             // Send current video URL and state to the new user
-            if (room.videoUrl) {
-                socket.emit('video_url_updated', room.videoUrl);
+            if (updatedRoom.videoUrl) {
+                socket.emit('video_url_updated', updatedRoom.videoUrl);
                 socket.emit('video_state_updated', {
-                    isPlaying: room.isPlaying,
-                    currentTime: room.currentTime,
+                    isPlaying: updatedRoom.isPlaying,
+                    currentTime: updatedRoom.currentTime,
                     duration: 0,
                     buffered: 0
                 });
             }
         } else {
-            callback(null);
+            callback({ error: 'Room not found' });
         }
     });
 

@@ -205,10 +205,15 @@ export const Room: React.FC = () => {
             return;
         }
 
-        socketService.joinRoom(roomId!, username, (joinedRoom) => {
-            if (joinedRoom) {
-                setRoom(joinedRoom);
-                const joinedUser = joinedRoom.users.find(u => u.username === username);
+        socketService.joinRoom(roomId!, username, (response) => {
+            if (response.error) {
+                setUsernameError(response.error);
+                return;
+            }
+
+            if (response.room) {
+                setRoom(response.room);
+                const joinedUser = response.room.users.find(u => u.username === username);
                 if (joinedUser) {
                     setCurrentUser(joinedUser);
                 }

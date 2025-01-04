@@ -33,20 +33,20 @@ class SocketService {
     }
 
     // Room operations
-    createRoom(username: string, callback: (room: Room) => void) {
+    createRoom(username: string, callback: (response: { room?: Room; error?: string }) => void) {
         const socket = this.connect();
         console.log('Creating room for user:', username);
-        socket?.emit('create_room', { username }, (response: Room) => {
-            console.log('Room created:', response);
-            callback(response);
+        socket?.emit('create_room', { username }, (room: Room) => {
+            console.log('Room created:', room);
+            callback({ room });
         });
     }
 
-    joinRoom(roomId: string, username: string, callback: (room: Room | null) => void) {
+    joinRoom(roomId: string, username: string, callback: (response: { room?: Room; error?: string }) => void) {
         if (this.socket) {
             this.socket.emit('joinRoom', { roomId, username }, callback);
         } else {
-            callback(null);
+            callback({ error: 'Socket connection not established' });
         }
     }
 

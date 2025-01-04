@@ -20,49 +20,48 @@ export const Home: React.FC = () => {
     const [error, setError] = useState('');
 
     const handleCreateRoom = () => {
-        if (!username) {
+        if (!username.trim()) {
             setError('Please enter a username');
             return;
         }
 
-        try {
-            console.log('Creating room with username:', username);
-            socketService.createRoom(username, (room) => {
-                if (room) {
-                    console.log('Room created:', room);
-                    navigate(`/room/${room.id}`, { state: { room } });
-                } else {
-                    console.error('Room creation failed');
-                    setError('An error occurred while creating the room');
-                }
-            });
-        } catch (err) {
-            console.error('Error creating room:', err);
-            setError('An error occurred while creating the room');
-        }
+        socketService.createRoom(username, (response) => {
+            if (response.error) {
+                setError(response.error);
+                return;
+            }
+
+            if (response.room) {
+                console.log('Room created:', response.room);
+                navigate(`/room/${response.room.id}`, { state: { room: response.room } });
+            } else {
+                console.error('Room creation failed');
+                setError('An error occurred while creating the room');
+            }
+        });
     };
 
     const handleJoinRoom = () => {
-        if (!username || !roomId) {
-            setError('Please enter username and room code');
+        if (!username.trim() || !roomId.trim()) {
+            setError('Please enter both username and room ID');
             return;
         }
 
-        try {
-            console.log('Joining room:', roomId, 'with username:', username);
-            socketService.joinRoom(roomId, username, (room) => {
-                if (room) {
-                    console.log('Joined room:', room);
-                    navigate(`/room/${room.id}`, { state: { room } });
-                } else {
-                    console.error('Room join failed');
-                    setError('An error occurred while joining the room');
-                }
-            });
-        } catch (err) {
-            console.error('Error joining room:', err);
-            setError('An error occurred while joining the room');
-        }
+        socketService.joinRoom(roomId, username, (response) => {
+            if (response.error) {
+                console.error('Room join failed:', response.error);
+                setError(response.error);
+                return;
+            }
+
+            if (response.room) {
+                console.log('Joined room:', response.room);
+                navigate(`/room/${response.room.id}`, { state: { room: response.room } });
+            } else {
+                console.error('Room join failed');
+                setError('An error occurred while joining the room');
+            }
+        });
     };
 
     return (
