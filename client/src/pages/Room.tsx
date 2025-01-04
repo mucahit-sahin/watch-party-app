@@ -92,7 +92,7 @@ export const Room: React.FC = () => {
             if (hostUser) {
                 setCurrentUser(hostUser);
             }
-            // Eğer odada video URL'si varsa, onu da ayarla
+            // If room has a video URL, set it
             if (roomFromState.videoUrl) {
                 setVideoUrl(roomFromState.videoUrl);
             }
@@ -100,13 +100,13 @@ export const Room: React.FC = () => {
 
         const socket = socketService.connect();
 
-        // Oda ve kullanıcı bilgilerini location state'inden al
+        // Get room and user information from location state
         const roomData = location.state?.room as RoomType;
         if (roomData) {
             console.log('Initial room data:', roomData);
             setRoom(roomData);
             
-            // Giriş yapan kullanıcıyı bul
+            // Find the joined user
             const joinedUser = roomData.users[roomData.users.length - 1];
             if (joinedUser) {
                 console.log('Setting current user:', joinedUser);
@@ -117,7 +117,7 @@ export const Room: React.FC = () => {
         const handleRoomUpdate = (updatedRoom: RoomType) => {
             console.log('Room updated:', updatedRoom);
             setRoom(updatedRoom);
-            // Mevcut kullanıcıyı güncelle
+            // Update current user
             if (currentUser) {
                 const updatedUser = updatedRoom.users.find(u => u.id === currentUser.id);
                 if (updatedUser) {
@@ -125,13 +125,13 @@ export const Room: React.FC = () => {
                     setCurrentUser(updatedUser);
                 }
             }
-            // Eğer odada video URL'si varsa, onu da güncelle
+            // If room has a video URL, update it
             if (updatedRoom.videoUrl) {
                 setVideoUrl(updatedRoom.videoUrl);
             }
         };
 
-        // Event listeners'ları temizle ve yeniden ekle
+        // Clear and re-add event listeners
         socketService.removeAllListeners();
 
         socketService.onVideoStateChange((newState: VideoState) => {

@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
     socket.on('joinRoom', ({ roomId, username }, callback) => {
         const room = roomManager.getRoom(roomId);
         
-        // Odada aynı kullanıcı adı var mı kontrol et
+        // Check if username already exists in the room
         if (room && room.users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
             callback({ error: 'Username already exists in this room' });
             return;
@@ -150,28 +150,28 @@ io.on('connection', (socket) => {
     socket.on('kick_user', ({ roomId, userId }) => {
         const room = roomManager.getRoom(roomId);
         if (room) {
-            // Kullanıcıyı odadan çıkar
+            // Remove user from room
             const kickedUser = room.users.find((u: { id: string }) => u.id === userId);
             if (kickedUser) {
-                // Kicklenen kullanıcının socket bilgisini bul
+                // Find socket info of kicked user
                 const kickedSocketId = Array.from(userRoomMap.entries())
                     .find(([_, info]) => info.userId === userId)?.[0];
 
                 if (kickedSocketId) {
-                    // Kicklenen kullanıcının socket'ine kicked event'ini gönder
+                    // Send kicked event to the kicked user's socket
                     const kickedSocket = io.sockets.sockets.get(kickedSocketId);
                     if (kickedSocket) {
                         kickedSocket.emit('kicked');
                         kickedSocket.leave(roomId);
                     }
 
-                    // Kullanıcıyı odadan çıkar
+                    // Remove user from room
                     const updatedRoom = roomManager.leaveRoom(roomId, userId);
                     if (updatedRoom) {
-                        // Odadaki diğer kullanıcılara güncel oda bilgisini gönder
+                        // Send updated room info to other users
                         io.to(roomId).emit('user_left', updatedRoom);
                         
-                        // System message gönder
+                        // Send system message
                         io.to(roomId).emit('message_received', {
                             id: Date.now().toString(),
                             userId: '',
@@ -182,7 +182,7 @@ io.on('connection', (socket) => {
                         });
                     }
 
-                    // User-room map'ten kullanıcıyı sil
+                    // Remove user from user-room map
                     userRoomMap.delete(kickedSocketId);
                 }
             }

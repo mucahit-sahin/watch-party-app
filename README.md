@@ -1,100 +1,123 @@
 # Watch Party App 🎥
 
-Watch Party is a web application that allows you to watch videos simultaneously with your friends. The application provides a shared movie/video watching experience with your remote friends by synchronizing video playback controls.
+Watch Party is a real-time video synchronization application that allows users to watch videos together. All viewers in the room see the same video content at the same time, with synchronized playback controls managed by the host.
 
 ## 🚀 Screenshots
 
 ### Home Page
+
 ![Home Page](screenshots/home.png)
-*Create a new room or join an existing one*
+_Create a new room or join an existing one with a username_
 
 ### Watch Room
+
 ![Watch Room](screenshots/room.png)
-*Watch videos together with real-time chat and synchronization*
+_Watch videos together with synchronized controls, real-time chat, and participant management_
 
 ## 🚀 Features
 
 - ✨ Real-time video synchronization
-- 🎮 Synchronization of play, pause, and seek controls
-- 💬 Real-time chat
-- 🎥 YouTube video support
-- 📁 Local video file support
-- 🔗 Video URL support
-- 👥 Room management and invitation system
+  - Play/Pause synchronization
+  - Seek position synchronization
+  - Playback speed synchronization
+  - Video URL synchronization
+- 👥 Room Management
+  - Create/Join rooms with unique codes
+  - Host privileges for video control
+  - Participant management (kick users)
+  - Unique username requirement per room
+- 💬 Real-time Chat
+  - Instant messaging between room participants
+  - System messages for room events
+  - User join/leave notifications
+- 🎮 Video Controls
+  - Full-screen support
+  - Volume control
+  - Playback speed control (0.25x to 2x)
+  - Progress bar with time display
+  - Loading indicator
+- 📱 Responsive Design
+  - Mobile-friendly interface
+  - Adaptive layout for different screen sizes
+  - Touch-friendly controls
 
 ## 🛠️ Technologies
 
-- **Frontend:**
-  - React.js
-  - Material-UI/Tailwind CSS
-  - Socket.io-client
-  - React Player
+### Frontend
 
-- **Backend:**
-  - Node.js
-  - Express.js
-  - Socket.io
-  - MongoDB/PostgreSQL
+- React.js with TypeScript
+- Material-UI (MUI) for UI components
+- Socket.IO Client for real-time communication
+- React Player for video playback
+
+### Backend
+
+- Node.js with TypeScript
+- Express.js for API server
+- Socket.IO for WebSocket connections
+- Room management system
 
 ## 🚦 Getting Started
 
-### Requirements
+### Prerequisites
 
 - Node.js (v14 or higher)
 - npm or yarn
-- MongoDB or PostgreSQL
 
 ### Installation
 
-1. Clone the project
+1. Clone the repository
+
 ```bash
-git clone https://github.com/username/watch-party-app.git
+git clone https://github.com/mucahit-sahin/watch-party-app.git
 cd watch-party-app
 ```
 
-2. Install dependencies
+2. Install dependencies for both client and server
+
 ```bash
+# Install server dependencies
+cd server
 npm install
-# or
-yarn install
+
+# Install client dependencies
+cd ../client
+npm install
 ```
 
-3. Start the development server
+3. Start the development servers
+
 ```bash
+# Start server (in server directory)
 npm run dev
-# or
-yarn dev
+
+# Start client (in client directory)
+npm start
 ```
 
 4. Open `http://localhost:3000` in your browser
 
 ## 📝 Usage
 
-1. Click "Create Room" button on the home page
-2. Share the generated room code with your friends
-3. Enter a video URL or upload a local video file
-4. Start watching together!
-
-## 🔒 Security
-
-- JWT-based authentication
-- Secure WebSocket connections
-- XSS and CSRF protection
-- Rate limiting
+1. Visit the home page
+2. Enter your username and either:
+   - Create a new room (automatically become host)
+   - Join an existing room (enter room code)
+3. If you're the host:
+   - Paste a video URL to start watching
+   - Control video playback (play/pause/seek)
+   - Manage participants (kick users if needed)
+4. All participants can:
+   - Chat with others in the room
+   - See who's in the room
+   - Adjust their local volume
+   - View in full screen
 
 ## 🤝 Contributing
 
-1. Fork this project
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: Add amazing feature'`)
-4. Push your branch (`git push origin feature/amazing-feature`)
-5. Create a Pull Request
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📜 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact & Social Media
+## 📞 Contact
 
 - **GitHub:** [@mucahit-sahin](https://github.com/mucahit-sahin)
 - **Project Repository:** [watch-party-app](https://github.com/mucahit-sahin/watch-party-app)
@@ -106,4 +129,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
   <a href="https://github.com/mucahit-sahin/watch-party-app">
     <img src="https://img.shields.io/github/stars/mucahit-sahin/watch-party-app?style=social" alt="GitHub stars"/>
   </a>
-</div> 
+</div>
