@@ -298,11 +298,19 @@ export const Room: React.FC = () => {
                 </DialogActions>
             </Dialog>
 
-            <Container maxWidth="xl" sx={{ mt: 2, mb: 2, height: 'calc(100vh - 32px)' }}>
-                <Grid container spacing={2} sx={{ height: '100%' }}>
+            <Container 
+                maxWidth="xl" 
+                sx={{ 
+                    mt: { xs: 1, md: 2 }, 
+                    mb: { xs: 1, md: 2 }, 
+                    height: { xs: '100vh', md: 'calc(100vh - 32px)' },
+                    p: { xs: 1, md: 2 }
+                }}
+            >
+                <Grid container spacing={{ xs: 1, md: 2 }} sx={{ height: '100%' }}>
                     {/* Left Panel - Video Player */}
-                    <Grid item xs={12} md={9} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <Paper sx={{ p: 2, mb: 2 }}>
+                    <Grid item xs={12} md={9} sx={{ height: { xs: '40vh', md: '100%' }, display: 'flex', flexDirection: 'column' }}>
+                        <Paper sx={{ p: { xs: 1, md: 2 }, mb: { xs: 1, md: 2 } }}>
                             {isHost && (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <TextField
@@ -316,6 +324,7 @@ export const Room: React.FC = () => {
                                         variant="contained"
                                         onClick={handleUpdateVideoUrl}
                                         disabled={!newVideoUrl}
+                                        size="small"
                                     >
                                         Change Video
                                     </Button>
@@ -324,23 +333,26 @@ export const Room: React.FC = () => {
                         </Paper>
                         
                         <Paper sx={{ 
-                            p: 2, 
+                            p: { xs: 1, md: 2 }, 
                             flex: 1, 
                             display: 'flex', 
                             flexDirection: 'column',
-                            minHeight: 0 // Bu önemli, flex child'ın taşmasını önler
+                            minHeight: 0
                         }}>
                             {videoUrl ? (
                                 <Box sx={{ 
                                     flex: 1,
                                     position: 'relative',
-                                    minHeight: 0, // Bu önemli, flex child'ın taşmasını önler
+                                    minHeight: { xs: '200px', md: 0 },
+                                    aspectRatio: '16/9',
                                     '& > div': { 
                                         position: 'absolute !important',
                                         top: 0,
                                         left: 0,
                                         right: 0,
-                                        bottom: 0
+                                        bottom: 0,
+                                        height: '100% !important',
+                                        width: '100% !important'
                                     }
                                 }}>
                                     <VideoPlayer
@@ -356,7 +368,9 @@ export const Room: React.FC = () => {
                                     display: 'flex', 
                                     alignItems: 'center', 
                                     justifyContent: 'center',
-                                    bgcolor: 'grey.100'
+                                    bgcolor: 'grey.100',
+                                    minHeight: { xs: '200px', md: 0 },
+                                    aspectRatio: '16/9'
                                 }}>
                                     <Typography variant="h6" color="text.secondary">
                                         Waiting for video URL...
@@ -367,23 +381,31 @@ export const Room: React.FC = () => {
                     </Grid>
 
                     {/* Right Panel - Tabs */}
-                    <Grid item xs={12} md={3} sx={{ height: '100%' }}>
+                    <Grid item xs={12} md={3} sx={{ height: { xs: 'calc(60vh - 16px)', md: '100%' } }}>
                         <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <Tabs
                                 value={tabValue}
                                 onChange={handleTabChange}
                                 variant="fullWidth"
-                                sx={{ borderBottom: 1, borderColor: 'divider' }}
+                                sx={{ 
+                                    borderBottom: 1, 
+                                    borderColor: 'divider',
+                                    minHeight: { xs: 48, md: 64 }
+                                }}
                             >
                                 <Tab 
                                     icon={<ChatIcon />} 
-                                    label="Chat"
-                                    sx={{ minHeight: 64 }}
+                                    label={<Box sx={{ display: { xs: 'none', md: 'block' } }}>Chat</Box>}
+                                    sx={{ minHeight: { xs: 48, md: 64 } }}
                                 />
                                 <Tab 
                                     icon={<People />} 
-                                    label={`Participants (${room?.users.length || 0})`}
-                                    sx={{ minHeight: 64 }}
+                                    label={
+                                        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                                            Participants ({room?.users.length || 0})
+                                        </Box>
+                                    }
+                                    sx={{ minHeight: { xs: 48, md: 64 } }}
                                 />
                             </Tabs>
 

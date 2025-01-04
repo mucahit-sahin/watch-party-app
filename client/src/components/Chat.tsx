@@ -46,10 +46,6 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
 
     return (
         <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h6">Chat</Typography>
-            </Box>
-
             <List sx={{ 
                 flex: 1, 
                 overflow: 'auto', 
