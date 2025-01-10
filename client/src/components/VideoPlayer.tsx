@@ -42,6 +42,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [prevVolume, setPrevVolume] = useState(1);
     const [isVolumeHovered, setIsVolumeHovered] = useState(false);
 
+    const SEEK_INTERVAL = 5; // 5 seconds jump
+
     useEffect(() => {
         if (!isDragging && !seekingRef.current && playerRef.current) {
             const diff = Math.abs(playerRef.current.getCurrentTime() - videoState.currentTime);
@@ -82,13 +84,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     const handleSeek = (seconds: number) => {
-        seekingRef.current = true;
         if (isHost) {
             onStateChange({ ...videoState, currentTime: seconds });
         }
-        setTimeout(() => {
-            seekingRef.current = false;
-        }, 1000);
     };
 
     const handleFullscreen = () => {
@@ -174,6 +172,40 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         if (volume < 0.5) return <VolumeDown />;
         return <VolumeUp />;
     };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!isHost) return;
+            
+            switch (e.key) {
+                case 'ArrowRight':
+                    const forwardTime = Math.min(localTime + SEEK_INTERVAL, videoState.duration);
+                    if (playerRef.current) {
+                        playerRef.current.seekTo(forwardTime, 'seconds');
+                    }
+                    setLocalTime(forwardTime);
+                    onStateChange({ ...videoState, currentTime: forwardTime });
+                    break;
+                case 'ArrowLeft':
+                    const backwardTime = Math.max(localTime - SEEK_INTERVAL, 0);
+                    if (playerRef.current) {
+                        playerRef.current.seekTo(backwardTime, 'seconds');
+                    }
+                    setLocalTime(backwardTime);
+                    onStateChange({ ...videoState, currentTime: backwardTime });
+                    break;
+                case ' ': // Spacebar
+                    e.preventDefault();
+                    onStateChange({ ...videoState, isPlaying: !videoState.isPlaying });
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isHost, localTime, videoState, onStateChange]);
 
     return (
         <Box ref={containerRef} sx={{ width: '100%', position: 'relative' }}>
