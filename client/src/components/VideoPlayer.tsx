@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { Box, IconButton, Slider, CircularProgress, Menu, MenuItem, Typography } from '@mui/material';
-import { PlayArrow, Pause, Fullscreen, FullscreenExit, Speed, VolumeUp, VolumeDown, VolumeOff } from '@mui/icons-material';
+import { PlayArrow, Pause, Fullscreen, FullscreenExit, Speed, VolumeUp, VolumeDown, VolumeOff, PictureInPicture } from '@mui/icons-material';
 import { VideoState } from '../types/types';
 
 interface VideoPlayerProps {
@@ -41,6 +41,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [volume, setVolume] = useState(1);
     const [prevVolume, setPrevVolume] = useState(1);
     const [isVolumeHovered, setIsVolumeHovered] = useState(false);
+    const [isPiPActive, setIsPiPActive] = useState(false);
 
     const SEEK_INTERVAL = 5; // 5 seconds jump
 
@@ -172,6 +173,37 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         if (volume < 0.5) return <VolumeDown />;
         return <VolumeUp />;
     };
+
+    const handlePiP = async () => {
+        try {
+            const video = document.querySelector('video');
+            if (!video) return;
+
+            if (document.pictureInPictureElement) {
+                await document.exitPictureInPicture();
+                setIsPiPActive(false);
+            } else {
+                await video.requestPictureInPicture();
+                setIsPiPActive(true);
+            }
+        } catch (error) {
+            console.error('PiP failed:', error);
+        }
+    };
+
+    useEffect(() => {
+        const handlePiPChange = () => {
+            setIsPiPActive(!!document.pictureInPictureElement);
+        };
+
+        document.addEventListener('enterpictureinpicture', handlePiPChange);
+        document.addEventListener('leavepictureinpicture', handlePiPChange);
+
+        return () => {
+            document.removeEventListener('enterpictureinpicture', handlePiPChange);
+            document.removeEventListener('leavepictureinpicture', handlePiPChange);
+        };
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -379,6 +411,21 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         </MenuItem>
                     ))}
                 </Menu>
+
+                <IconButton
+                    onClick={handlePiP}
+                    sx={{ 
+                        color: 'white', 
+                        mr: 1,
+                        display: document.pictureInPictureEnabled ? 'flex' : 'none'
+                    }}
+                >
+                    <PictureInPicture 
+                        sx={{ 
+                            color: isPiPActive ? 'primary.main' : 'white' 
+                        }} 
+                    />
+                </IconButton>
 
                 <IconButton
                     onClick={handleFullscreen}
