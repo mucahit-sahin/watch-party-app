@@ -142,6 +142,7 @@ export const Room: React.FC = () => {
         socketService.onVideoUrlChange((url: string) => {
             console.log('Video URL changed:', url);
             setVideoUrl(url);
+            setNewVideoUrl(url);
         });
 
         socketService.onMessageReceived((message: Message) => {
@@ -195,7 +196,6 @@ export const Room: React.FC = () => {
             console.log('Updating video URL:', newVideoUrl);
             socketService.updateVideoUrl(roomId, newVideoUrl);
             setVideoUrl(newVideoUrl);
-            setNewVideoUrl('');
         }
     };
 
