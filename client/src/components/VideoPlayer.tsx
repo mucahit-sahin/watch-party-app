@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { Box, IconButton, Slider, CircularProgress, Menu, MenuItem, Typography } from '@mui/material';
-import { PlayArrow, Pause, Fullscreen, FullscreenExit, Speed, VolumeUp, VolumeDown, VolumeOff, PictureInPicture } from '@mui/icons-material';
+import { PlayArrow, Pause, Fullscreen, FullscreenExit, Speed, VolumeUp, VolumeDown, VolumeOff, PictureInPicture, Settings } from '@mui/icons-material';
 import { VideoState } from '../types/types';
 
 interface VideoPlayerProps {
@@ -42,6 +42,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [prevVolume, setPrevVolume] = useState(1);
     const [isVolumeHovered, setIsVolumeHovered] = useState(false);
     const [isPiPActive, setIsPiPActive] = useState(false);
+    const [settingsMenuAnchor, setSettingsMenuAnchor] = useState<null | HTMLElement>(null);
 
     const SEEK_INTERVAL = 5; // 5 seconds jump
 
@@ -239,6 +240,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         };
     }, [isHost, localTime, videoState, onStateChange]);
 
+    const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
+        setSettingsMenuAnchor(event.currentTarget);
+    };
+
+    const handleSettingsClose = () => {
+        setSettingsMenuAnchor(null);
+    };
+
     return (
         <Box ref={containerRef} sx={{ width: '100%', position: 'relative' }}>
             <ReactPlayer
@@ -338,7 +347,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
                 <Box
                     sx={{
-                        display: 'flex',
+                        display: { xs: 'none', sm: 'flex' },
                         alignItems: 'center',
                         width: isVolumeHovered ? 120 : 40,
                         transition: 'width 0.2s',
@@ -383,7 +392,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <IconButton
                     onClick={handleSpeedMenuOpen}
                     disabled={!isHost}
-                    sx={{ color: 'white', mr: 1 }}
+                    sx={{ 
+                        color: 'white', 
+                        mr: 1,
+                        display: { xs: 'none', sm: 'flex' }
+                    }}
                 >
                     <Speed />
                 </IconButton>
@@ -417,7 +430,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     sx={{ 
                         color: 'white', 
                         mr: 1,
-                        display: document.pictureInPictureEnabled ? 'flex' : 'none'
+                        display: { 
+                            xs: 'none', 
+                            sm: document.pictureInPictureEnabled ? 'flex' : 'none'
+                        }
                     }}
                 >
                     <PictureInPicture 
@@ -426,6 +442,72 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         }} 
                     />
                 </IconButton>
+
+                <IconButton
+                    onClick={handleSettingsClick}
+                    sx={{ 
+                        color: 'white',
+                        mr: 1,
+                        display: { xs: 'flex', sm: 'none' }
+                    }}
+                >
+                    <Settings />
+                </IconButton>
+
+                <Menu
+                    anchorEl={settingsMenuAnchor}
+                    open={Boolean(settingsMenuAnchor)}
+                    onClose={handleSettingsClose}
+                    PaperProps={{
+                        sx: {
+                            bgcolor: 'rgba(0, 0, 0, 0.9)',
+                            color: 'white',
+                            width: 250
+                        }
+                    }}
+                >
+                    <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <IconButton
+                            onClick={handleVolumeClick}
+                            sx={{ color: 'white' }}
+                        >
+                            {getVolumeIcon()}
+                        </IconButton>
+                        <Slider
+                            sx={{
+                                width: '140px',
+                                '& .MuiSlider-track': { color: 'white' },
+                                '& .MuiSlider-rail': { color: 'rgba(255,255,255,0.3)' },
+                                '& .MuiSlider-thumb': {
+                                    width: 12,
+                                    height: 12,
+                                }
+                            }}
+                            value={volume * 100}
+                            onChange={handleVolumeChange}
+                            size="small"
+                        />
+                    </MenuItem>
+
+                    <MenuItem 
+                        onClick={handleSpeedMenuOpen}
+                        disabled={!isHost}
+                        sx={{ color: 'white' }}
+                    >
+                        <Speed sx={{ mr: 2 }} />
+                        Playback Speed: {videoState.playbackSpeed}x
+                    </MenuItem>
+
+                    {document.pictureInPictureEnabled && (
+                        <MenuItem 
+                            onClick={handlePiP}
+                            sx={{ color: 'white' }}
+                        >
+                            <PictureInPicture sx={{ mr: 2 }} />
+                            Picture in Picture
+                        </MenuItem>
+                    )}
+                </Menu>
 
                 <IconButton
                     onClick={handleFullscreen}
