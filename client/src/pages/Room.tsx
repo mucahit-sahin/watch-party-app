@@ -54,6 +54,13 @@ function TabPanel(props: TabPanelProps) {
     );
 }
 
+// Add formatTime function at the top level if not already present
+const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+
 export const Room: React.FC = () => {
     const { roomId } = useParams<{ roomId: string }>();
     const navigate = useNavigate();
@@ -161,6 +168,20 @@ export const Room: React.FC = () => {
             }, 2000);
         });
 
+        socketService.onUserTimeUpdate((roomId, userId, currentTime) => {
+            setRoom(prevRoom => {
+                if (!prevRoom) return prevRoom;
+                return {
+                    ...prevRoom,
+                    users: prevRoom.users.map(user => 
+                        user.id === userId 
+                            ? { ...user, currentTime }
+                            : user
+                    )
+                };
+            });
+        });
+
         // Cleanup function
         return () => {
             if (roomId && currentUser) {
@@ -236,6 +257,13 @@ export const Room: React.FC = () => {
         }
     };
 
+    // Add function to update current user's time
+    const handleTimeUpdate = (currentTime: number) => {
+        if (roomId && currentUser) {
+            socketService.updateUserTime(roomId, currentUser.id, currentTime);
+        }
+    };
+
     if (!roomId) return null;
 
     const ParticipantsList = () => (
@@ -261,7 +289,14 @@ export const Room: React.FC = () => {
                     </ListItemIcon>
                     <ListItemText 
                         primary={user.username}
-                        secondary={user.isHost ? '(Host)' : ''}
+                        secondary={
+                            <>
+                                {user.isHost ? '(Host) ' : ''}
+                                {typeof user.currentTime === 'number' && 
+                                    `at ${formatTime(user.currentTime)}`
+                                }
+                            </>
+                        }
                     />
                 </ListItem>
             ))}
@@ -360,6 +395,7 @@ export const Room: React.FC = () => {
                                         videoState={videoState}
                                         onStateChange={handleVideoStateChange}
                                         isHost={isHost}
+                                        onTimeUpdate={handleTimeUpdate}
                                     />
                                 </Box>
                             ) : (

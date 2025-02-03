@@ -9,6 +9,7 @@ interface VideoPlayerProps {
     videoState: VideoState;
     onStateChange: (state: VideoState) => void;
     isHost: boolean;
+    onTimeUpdate?: (currentTime: number) => void;
 }
 
 const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
@@ -28,7 +29,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     url,
     videoState,
     onStateChange,
-    isHost
+    isHost,
+    onTimeUpdate
 }) => {
     const playerRef = useRef<ReactPlayer>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -69,13 +71,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     const handleProgress = (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => {
-        if (!seekingRef.current && !isDragging && isHost) {
-            onStateChange({
-                ...videoState,
-                currentTime: state.playedSeconds,
-                buffered: state.loadedSeconds
-            });
+        if (!seekingRef.current && !isDragging) {
+            if (isHost) {
+                onStateChange({
+                    ...videoState,
+                    currentTime: state.playedSeconds,
+                    buffered: state.loadedSeconds
+                });
+            }
             setLocalTime(state.playedSeconds);
+            onTimeUpdate?.(state.playedSeconds);
         }
     };
 

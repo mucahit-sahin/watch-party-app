@@ -2,6 +2,7 @@ export interface User {
     id: string;
     username: string;
     isHost: boolean;
+    currentTime?: number;
 }
 
 export interface Room {

@@ -2,7 +2,7 @@ import { Room, User, VideoState, RoomManager } from '../types/types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Implementation of the RoomManager interface
-class RoomManagerImpl implements RoomManager {
+export class RoomManagerImpl implements RoomManager {
     rooms: Map<string, Room>;
 
     constructor() {
@@ -113,6 +113,22 @@ class RoomManagerImpl implements RoomManager {
         room.isPlaying = false;
         console.log('Video URL updated:', { roomId, url });
         this.rooms.set(roomId, room);
+    }
+
+    // Add new method to update user's current time
+    updateUserTime(roomId: string, userId: string, currentTime: number): Room | null {
+        const room = this.rooms.get(roomId);
+        if (!room) return null;
+
+        const updatedUsers = room.users.map(user => 
+            user.id === userId 
+                ? { ...user, currentTime }
+                : user
+        );
+
+        const updatedRoom = { ...room, users: updatedUsers };
+        this.rooms.set(roomId, updatedRoom);
+        return updatedRoom;
     }
 }
 

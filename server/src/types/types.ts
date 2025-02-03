@@ -2,6 +2,7 @@ export interface User {
     id: string;
     username: string;
     isHost: boolean;
+    currentTime?: number;
 }
 
 export interface Room {
@@ -36,4 +37,5 @@ export interface RoomManager {
     getRoom: (roomId: string) => Room | null;
     updateVideoState: (roomId: string, videoState: VideoState) => void;
     updateVideoUrl: (roomId: string, url: string) => void;
+    updateUserTime: (roomId: string, userId: string, currentTime: number) => Room | null;
 } 

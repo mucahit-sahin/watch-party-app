@@ -127,6 +127,16 @@ class SocketService {
             this.socket.removeAllListeners();
         }
     }
+
+    updateUserTime(roomId: string, userId: string, currentTime: number) {
+        this.socket?.emit('updateUserTime', { roomId, userId, currentTime });
+    }
+
+    onUserTimeUpdate(callback: (roomId: string, userId: string, currentTime: number) => void) {
+        this.socket?.on('userTimeUpdate', ({ roomId, userId, currentTime }) => {
+            callback(roomId, userId, currentTime);
+        });
+    }
 }
 
 export const socketService = SocketService.getInstance(); 

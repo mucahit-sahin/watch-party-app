@@ -188,6 +188,18 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    // Add this new event handler
+    socket.on('updateUserTime', ({ roomId, userId, currentTime }) => {
+        const room = roomManager.getRoom(roomId);
+        if (room) {
+            const updatedRoom = roomManager.updateUserTime(roomId, userId, currentTime);
+            if (updatedRoom) {
+                // Broadcast the time update to all users in the room
+                io.to(roomId).emit('userTimeUpdate', { roomId, userId, currentTime });
+            }
+        }
+    });
 });
 
 // Function to handle user leaving
